@@ -18,19 +18,19 @@ class graphite (
   }
 
   # Replace the need for apache with gunicorn/nginx
-  gunicorn::app { 'graphite':
-    approot         => $graphiteapproot,
-    gunicorn_socket => $graphitegunsocket,
-    require         => User[$graphiteuser],
-  } ->
-  nginx::unicorn { 'graphite':
-      servername     => $servername,
-      port           => 80,
-      unicorn_socket => $graphitegunsocket,
-      path           => $graphiteapproot,
-      aliases        => $graphite_aliases,
-      gunicorn       => true,
-  }
+  #gunicorn::app { 'graphite':
+  #  approot         => $graphiteapproot,
+  #  gunicorn_socket => $graphitegunsocket,
+  #  require         => User[$graphiteuser],
+  #} ->
+  #nginx::unicorn { 'graphite':
+  #    servername     => $servername,
+  #    port           => 80,
+  #    unicorn_socket => $graphitegunsocket,
+  #    path           => $graphiteapproot,
+  #    aliases        => $graphite_aliases,
+  #    gunicorn       => true,
+  #}
 
   package { 'python-cairo':           ensure => installed; }
   package { 'python-memcache':        ensure => installed; }
@@ -40,6 +40,11 @@ class graphite (
   package { 'memcached':              ensure => installed; }
   package { 'python-django-tagging':  ensure => installed; }
   package { 'python-simplejson':      ensure => installed; }
+
+  group { $graphite::params::graphitegroup:
+    ensure => present,
+    before => User[$graphiteuser],
+  }
 
   user { $graphiteuser:
     ensure     => present,
@@ -121,11 +126,6 @@ class graphite (
       Exec['install whisper'],
       Exec['remove stale carbon-cache pidfile'],
       ],
-  }
-
-  bacula::job {
-    "${fqdn}-graphite":
-      files => ["${graphitedir}"],
   }
 
   cron { 'remove ancient graphite log files':

@@ -100,4 +100,23 @@ class graphite::install {
     require     => File[$graphitedir],
   }
 
+  package { "gunicorn":
+    ensure => present,
+  }
+
+  service { "gunicorn":
+    enable => true,
+    ensure => running,
+    require => Package["gunicorn"],
+  }
+
+  file { "/etc/gunicorn.d/graphite":
+    ensure => present,
+    owner  => root,
+    mode   => "0644",
+    source  => "puppet:///modules/graphite/graphite-gunicorn.conf",
+    notify => Service["gunicorn"],
+    require => Package["gunicorn"],
+  }
+
 }
