@@ -17,21 +17,6 @@ class graphite (
       '/media/' => '/usr/share/pyshared/django/contrib/admin/'
   }
 
-  # Replace the need for apache with gunicorn/nginx
-  #gunicorn::app { 'graphite':
-  #  approot         => $graphiteapproot,
-  #  gunicorn_socket => $graphitegunsocket,
-  #  require         => User[$graphiteuser],
-  #} ->
-  #nginx::unicorn { 'graphite':
-  #    servername     => $servername,
-  #    port           => 80,
-  #    unicorn_socket => $graphitegunsocket,
-  #    path           => $graphiteapproot,
-  #    aliases        => $graphite_aliases,
-  #    gunicorn       => true,
-  #}
-
   package { 'python-cairo':           ensure => installed; }
   package { 'python-memcache':        ensure => installed; }
   package { 'python-sqlite':          ensure => installed; }

@@ -107,7 +107,7 @@ class graphite::install {
   service { "gunicorn":
     enable => true,
     ensure => running,
-    require => Package["gunicorn"],
+    require => File["/etc/gunicorn.d/graphite"],
   }
 
   file { "/etc/gunicorn.d/graphite":
@@ -116,7 +116,21 @@ class graphite::install {
     mode   => "0644",
     source  => "puppet:///modules/graphite/graphite-gunicorn.conf",
     notify => Service["gunicorn"],
-    require => Package["gunicorn"],
+    require => [Package["gunicorn"], Exec["install graphite"]],
   }
+
+
+  nginx::resource::vhost { 'graphite.sf2-base.dev':
+    ensure   => present,
+    proxy    => 'http://graphite_server',
+  }
+
+  nginx::resource::upstream { 'graphite_server':
+     ensure  => present,
+     members => [
+       '127.0.0.1:8000',
+     ],
+   }
+
 
 }
